@@ -1,4 +1,3 @@
-# Wstęp
 Projekt jest realizowany w ramach zajęć z przedmiotu Internet Rzeczy.
 
 # Założenia projektowe
@@ -31,12 +30,3 @@ W trybie DEBUG_MODE szczegółowe informacje o stanie działania systemu i przes
 - iot.py
 - main.py
 ```
-Plik iot.py implementuje system komunikacji z wieloma urządzeniami BLE (Bluetooth Low Energy) jednocześnie za pomocą protokołu UART (Universal Asynchronous Receiver-Transmitter).
-Program umożliwia:
-- Skanowanie i nawiązywanie połączeń z urządzeniami BLE, które obsługują usługę UART.
-- Obsługę wielu połączeń jednocześnie (do maksymalnej liczby zdefiniowanej przez max_connections).
-- Odczyt danych z każdego połączonego urządzenia BLE w sposób asynchroniczny.
-- Automatyczne wykrywanie i usuwanie urządzeń, które się rozłączyły.
-
-
-Plik main.py implementuje klienta MQTT do komunikacji z serwerem ThingsBoard, platformą IoT do monitorowania i zarządzania urządzeniami.
