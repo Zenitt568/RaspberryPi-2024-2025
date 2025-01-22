@@ -4,7 +4,7 @@ from adafruit_ble.services.nordic import UARTService
 from tb_gateway_mqtt import TBDeviceMqttClient
 import logging.handlers
 import time
-
+import os
    
 ACCESS_TOKEN = "dotqWC7IdD1wMDy9SN1D"
 THINGSBOARD_SERVER = 'iot.makowski.edu.pl'
@@ -18,6 +18,8 @@ uart_connections = []
 connection_addresses = {}  # Maps connections to addresses
 max_connections = 5  # Set this to the desired number of simultaneous sensors
 lineRead = False;
+line = ""
+sensorData = ""
 
 # callback function that will call when we will change value of our Shared Attribute
 def attribute_callback(result, _):
@@ -38,11 +40,10 @@ def rpc_callback(id, request_body):
         print('Unknown method: ' + method)
  
 
-def getData():
-    line = ''
+def getData(line):
+    global lineRead
     # Scan for new devices if there are fewer connections than desired
     if len(uart_connections) < max_connections:
-        print(uart_connections)
         print("Scanning for new devices...")
         for adv in ble.start_scan(ProvideServicesAdvertisement, timeout=2):
             # Only connect to devices that haven't been connected before
@@ -70,7 +71,7 @@ def getData():
             try:
                 # Read line from the UART service if available
                 if uart_service.in_waiting:
-                    lineRead = True;
+                    lineRead = True
                     line = uart_service.readline().decode("utf-8").strip()
                     print(f"Received from {connection}: {line}")
 
@@ -88,11 +89,13 @@ def getData():
     return line
  
    
-def prepare_data():
-   
-    temperature = float(sensorData[1:5])
-    pressure = float(sensorData[7:13])
-    humidity = float(sensorData[15:19])
+def prepare_data(sensorData):
+    global sensor
+    ip_address = os.popen('''hostname -I''').readline().replace('\n','').replace(',','.')[:-1]
+    mac_address = os.popen('''cat /sys/class/net/*/address''').readline().replace('\n','').replace(',','.')
+    temperature = float(sensorData[3:7])
+    pressure = float(sensorData[9:15])
+    humidity = float(sensorData[17:21])
 
     attributes = {
         'ip_address': ip_address,
@@ -115,8 +118,10 @@ def sync_state(result, exception=None):
          period = result.get('shared', {'blinkingPeriod': 1.0})['blinkingPeriod']
 
 def main():
-     
+     global line
+     global sensorData
      global client
+     global lineRead
      client = TBDeviceMqttClient(THINGSBOARD_SERVER, username=ACCESS_TOKEN)
      client.connect()
      client.request_attributes(shared_keys=['blinkingPeriod'], callback=sync_state)
@@ -128,14 +133,16 @@ def main():
      # now rpc_callback will process rpc requests from server
      client.set_server_side_rpc_request_handler(rpc_callback)
     
-     while not lineRead:
-          line = getData()
+
           
      while not client.stopped:
-         attributes, telemetry = prepare_data()
+         while not lineRead:
+             sensorData = getData(line)
+         attributes, telemetry = prepare_data(sensorData)
          client.send_attributes(attributes)
          client.send_telemetry(telemetry)
-         time.sleep(60)
+         time.sleep(10)
+         lineRead = False
    
 if __name__=='__main__':
     if ACCESS_TOKEN != "TEST_TOKEN":
