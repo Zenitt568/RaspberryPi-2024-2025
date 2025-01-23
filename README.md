@@ -26,13 +26,14 @@ Przesyłanie danych przez BLE:
 
 Tryb debugowania:
 W trybie DEBUG_MODE szczegółowe informacje o stanie działania systemu i przesyłanych danych są wyświetlane w konsoli.
-
-Plik main.py odczytuje dane z Adafruit Feather przetwarza je i przesyła do platformy Thingsboard z wykorzystaniem protokołu MQTT. Na poniższym rysunku pokazano wyniki z platformy ThingsBoard:
-
-![Bez tytułu](https://github.com/user-attachments/assets/c96d99e7-c63a-4c67-b6a1-0097036be20f)
-
 ## Raspberry PI
 ```
 - iot.py
 - main.py
 ```
+
+Plik main.py odczytuje dane z Adafruit Feather przetwarza je i przesyła do platformy Thingsboard z wykorzystaniem protokołu MQTT. Na poniższym rysunku pokazano wyniki z platformy ThingsBoard:
+
+![Bez tytułu](https://github.com/user-attachments/assets/c96d99e7-c63a-4c67-b6a1-0097036be20f)
+
+
